@@ -1,30 +1,29 @@
-import { Bot } from 'grammy';
-import express from 'express';
-import https from 'https';
-import http from 'http';
+const { Telegraf } = require('telegraf');
+const axios = require('axios');
+const express = require('express');
 
 const token = process.env.BOT_TOKEN;
 
 if (!token) {
-  console.error('❌ لطفاً BOT_TOKEN را در Secrets تنظیم کنید!');
+  console.error('❌ توکن ربات را در Secrets وارد کنید!');
   process.exit(1);
 }
 
-const bot = new Bot(token);
+const bot = new Telegraf(token);
 
-console.log('✅ ربات راه‌اندازی شد!');
+console.log('✅ ربات شروع به کار کرد!');
 
 // دستور start
-bot.command('start', (ctx) => {
+bot.start((ctx) => {
   ctx.reply(
     '👋 سلام!\n\n' +
-    '📎 لینک دانلود فایل را ارسال کنید\n' +
-    'من آن را دانلود و برایتان آپلود می‌کنم'
+    '📎 لینک دانلود فایل را بفرستید\n' +
+    'من آن را دانلود و آپلود می‌کنم'
   );
 });
 
-// دریافت لینک
-bot.on('message:text', async (ctx) => {
+// دریافت پیام
+bot.on('text', async (ctx) => {
   const text = ctx.message.text;
 
   if (!text.startsWith('http://') && !text.startsWith('https://')) {
@@ -32,69 +31,70 @@ bot.on('message:text', async (ctx) => {
   }
 
   try {
-    await ctx.reply('⏳ در حال دانلود فایل...');
+    await ctx.reply('⏳ در حال دانلود...');
 
     const fileName = text.split('/').pop().split('?')[0] || 'file.mkv';
     
-    console.log(`📥 دانلود: ${fileName}`);
+    console.log(`📥 دانلود شروع شد: ${fileName}`);
 
     // دانلود فایل
-    const fileStream = await downloadFile(text);
+    const response = await axios({
+      method: 'GET',
+      url: text,
+      responseType: 'stream',
+      timeout: 0,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    });
 
     console.log(`📤 آپلود به تلگرام...`);
 
-    // ارسال به تلگرام
-    await ctx.replyWithDocument({
-      url: text,
-      filename: fileName
-    }, {
-      caption: `✅ ${fileName}`
-    });
+    // آپلود به تلگرام
+    await ctx.replyWithDocument(
+      {
+        source: response.data,
+        filename: fileName
+      },
+      {
+        caption: `✅ ${fileName}`
+      }
+    );
 
-    await ctx.reply('✅ فایل با موفقیت آپلود شد!');
-    console.log(`✅ موفق: ${fileName}`);
+    await ctx.reply('✅ آپلود موفق!');
+    console.log(`✅ تمام شد: ${fileName}`);
 
   } catch (error) {
-    console.error('❌ خطا:', error);
+    console.error('❌ خطا:', error.message);
     
-    let errorMsg = '❌ خطا در پردازش!';
+    let msg = '❌ خطا در پردازش!';
     
-    if (error.message.includes('file is too big')) {
-      errorMsg = '❌ فایل خیلی بزرگه! (حداکثر 2GB)';
-    } else if (error.message.includes('not found')) {
-      errorMsg = '❌ فایل پیدا نشد!';
+    if (error.response?.status === 404) {
+      msg = '❌ فایل پیدا نشد!';
+    } else if (error.code === 'ENOTFOUND') {
+      msg = '❌ لینک نامعتبر است!';
+    } else if (error.message.includes('too large')) {
+      msg = '❌ فایل خیلی بزرگه!';
     }
     
-    await ctx.reply(errorMsg);
+    await ctx.reply(msg);
   }
 });
 
-// تابع کمکی دانلود
-function downloadFile(url) {
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
-    
-    protocol.get(url, (response) => {
-      if (response.statusCode === 200) {
-        resolve(response);
-      } else {
-        reject(new Error(`HTTP ${response.statusCode}`));
-      }
-    }).on('error', reject);
-  });
-}
+// راه‌اندازی ربات
+bot.launch();
 
-// شروع ربات
-bot.start();
-
-// Keep-alive سرور
+// Keep-alive
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.send('🤖 Bot is running!');
+  res.send('🤖 ربات فعال است!');
 });
 
 app.listen(PORT, () => {
-  console.log(`🌐 Server on port ${PORT}`);
+  console.log(`🌐 سرور روی پورت ${PORT} اجرا شد`);
 });
+
+// مدیریت خاموش شدن
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
