@@ -1,56 +1,46 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const stream = require('stream');
+const express = require('express');
 
-const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN';
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-
-console.log('Bot started...');
+const token = process.env.BOT_TOKEN;
+const bot = new TelegramBot(token, { polling: true });
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
   if (!text || (!text.startsWith('http://') && !text.startsWith('https://'))) {
-    return bot.sendMessage(chatId, '📎 لطفاً لینک دانلود فایل را ارسال کنید.');
+    return bot.sendMessage(chatId, '📎 لینک فایل را ارسال کنید');
   }
 
   try {
-    await bot.sendMessage(chatId, '⏳ در حال دانلود و آپلود...');
+    await bot.sendMessage(chatId, '⏳ شروع دانلود...');
     
-    // دریافت نام فایل
-    const fileName = text.split('/').pop().split('?')[0] || 'file.mkv';
+    const fileName = text.split('/').pop().split('?')[0];
     
-    // دانلود فایل به صورت استریم
     const response = await axios({
-      method: 'GET',
       url: text,
+      method: 'GET',
       responseType: 'stream',
       timeout: 0,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
+      maxContentLength: Infinity
     });
 
-    // ارسال به تلگرام
-    await bot.sendDocument(chatId, response.data, {
-      caption: `📥 ${fileName}`
-    }, {
+    await bot.sendDocument(chatId, response.data, {}, {
       filename: fileName,
-      contentType: 'video/x-matroska'
+      contentType: 'application/octet-stream'
     });
 
-    await bot.sendMessage(chatId, '✅ فایل با موفقیت آپلود شد!');
-
-  } catch (error) {
-    console.error(error);
-    await bot.sendMessage(chatId, `❌ خطا: ${error.message}`);
+    await bot.sendMessage(chatId, '✅ فایل آپلود شد!');
+  } catch (err) {
+    await bot.sendMessage(chatId, `❌ خطا: ${err.message}`);
   }
 });
 
 // Keep alive
-const http = require('http');
-const server = http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end('Bot is running!');
-});
-server.listen(process.env.PORT || 3000);
+const app = express();
+app.get('/', (req, res) => res.send('Running'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server on ${PORT}`));
+
+console.log('Bot is running...');
