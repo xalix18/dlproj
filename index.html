@@ -56,13 +56,22 @@
         camera.position.set(0, 2, 5);
 
         // ---------- 3. رندرر (Renderer) ----------
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1;
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        document.body.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({
+    antialias: false,
+    powerPreference: "low-power"
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 1.5)
+);
+
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+document.body.appendChild(renderer.domElement);
 
         // ---------- 4. کنترل چرخش با ماوس (OrbitControls) ----------
         const controls = new OrbitControls(camera, renderer.domElement);
