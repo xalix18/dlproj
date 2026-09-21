@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>3D Model Viewer</title>
 
@@ -17,205 +18,158 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: Tahoma, sans-serif;
             background: #111;
+            font-family: Arial, sans-serif;
         }
 
         canvas {
             display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
         }
 
-        /* ==============================
-           Model Selector
-        ============================== */
+        /* -------------------------
+           MODEL LIST
+        ------------------------- */
 
-        #modelSelector {
+        #modelList {
             position: fixed;
             inset: 0;
-            z-index: 20;
+            z-index: 10;
 
-            background:
-                radial-gradient(
-                    circle at top,
-                    #263238,
-                    #111 65%
-                );
-
-            color: white;
+            padding: 25px;
 
             overflow-y: auto;
 
-            padding: 40px 20px;
+            background:
+                radial-gradient(circle at top, #26344d 0%, #111827 45%, #080b10 100%);
+
+            color: white;
         }
 
-        .selector-container {
-            width: min(900px, 100%);
-            margin: auto;
-        }
-
-        .title {
+        #modelList h1 {
+            margin: 0 0 8px;
             text-align: center;
-            margin-bottom: 35px;
+            font-size: 28px;
         }
 
-        .title h1 {
-            margin: 0 0 10px;
-            font-size: 30px;
-        }
-
-        .title p {
-            margin: 0;
+        #modelList p {
+            text-align: center;
             color: #aaa;
+            margin-bottom: 30px;
         }
 
-        #models {
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(250px, 1fr));
+        #cards {
+            width: min(1000px, 100%);
+            margin: auto;
 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 18px;
         }
 
         .model-card {
-            background: #1c1c1c;
-            border: 1px solid #333;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
             padding: 20px;
 
-            transition:
-                transform .2s,
-                border-color .2s;
+            backdrop-filter: blur(10px);
 
-            cursor: pointer;
+            transition: 0.2s;
         }
 
         .model-card:hover {
-            transform: translateY(-4px);
-            border-color: #4da3ff;
-        }
-
-        .model-icon {
-            width: 60px;
-            height: 60px;
-
-            border-radius: 14px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: #263238;
-
-            font-size: 28px;
-
-            margin-bottom: 15px;
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.11);
         }
 
         .model-name {
             font-size: 18px;
             font-weight: bold;
-
-            direction: ltr;
-            text-align: left;
-
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            margin-bottom: 10px;
+            word-break: break-word;
         }
 
         .model-path {
-            color: #777;
+            color: #999;
             font-size: 12px;
-
-            direction: ltr;
-            text-align: left;
-
-            margin-top: 7px;
-
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            word-break: break-all;
+            margin-bottom: 18px;
         }
 
-        .open-button {
+        .open-btn {
             width: 100%;
-            margin-top: 18px;
+            border: none;
+            border-radius: 10px;
 
             padding: 12px;
 
-            border: 0;
-            border-radius: 10px;
-
-            background: #1976d2;
+            background: #2563eb;
             color: white;
 
             font-size: 15px;
-
             cursor: pointer;
         }
 
-        .open-button:hover {
-            background: #2196f3;
+        .open-btn:active {
+            transform: scale(0.98);
         }
 
-        #status {
-            text-align: center;
-            color: #aaa;
-            margin: 30px 0;
-        }
-
-        /* ==============================
-           Viewer
-        ============================== */
+        /* -------------------------
+           VIEWER
+        ------------------------- */
 
         #viewer {
             position: fixed;
             inset: 0;
             display: none;
-            background: #111;
         }
 
-        #viewer.active {
-            display: block;
-        }
-
-        #backButton {
+        #backBtn {
             position: fixed;
-            top: 15px;
-            right: 15px;
+            top: 18px;
+            left: 18px;
 
-            z-index: 10;
+            z-index: 20;
 
-            border: 0;
-            border-radius: 10px;
+            border: none;
+            border-radius: 12px;
 
-            background: rgba(0, 0, 0, .65);
+            padding: 12px 18px;
+
+            background: rgba(0,0,0,0.65);
             color: white;
-
-            padding: 11px 16px;
 
             cursor: pointer;
 
-            font-family: Tahoma;
+            backdrop-filter: blur(8px);
         }
 
-        #modelInfo {
+        #centerBtn {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 18px;
+            right: 18px;
 
-            z-index: 10;
+            z-index: 20;
 
+            border: none;
+            border-radius: 12px;
+
+            padding: 12px 18px;
+
+            background: rgba(0,0,0,0.65);
             color: white;
 
-            background: rgba(0, 0, 0, .55);
+            cursor: pointer;
 
-            padding: 8px 14px;
-
-            border-radius: 20px;
-
-            direction: ltr;
+            backdrop-filter: blur(8px);
         }
+
+        /* -------------------------
+           LOADING
+        ------------------------- */
 
         #loading {
             position: fixed;
@@ -230,119 +184,132 @@
 
             flex-direction: column;
 
-            background: #111;
+            background: rgba(0,0,0,0.9);
 
             color: white;
         }
 
-        #loading.active {
-            display: flex;
+        #loadingText {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        #progressContainer {
+            width: min(350px, 80%);
+            height: 8px;
+
+            background: #333;
+            border-radius: 20px;
+
+            overflow: hidden;
         }
 
         #progress {
-            width: min(300px, 80%);
-            height: 6px;
-
-            background: #333;
-
-            border-radius: 10px;
-
-            overflow: hidden;
-
-            margin-top: 15px;
-        }
-
-        #bar {
             width: 0%;
             height: 100%;
 
-            background: #2196f3;
+            background: #2563eb;
 
-            transition: width .15s;
+            transition: width 0.15s;
         }
 
         #error {
-            color: #ff7777;
-            margin-top: 20px;
-            max-width: 90%;
+            margin-top: 15px;
+            color: #ff7070;
+            max-width: 80%;
             text-align: center;
         }
 
+        /* -------------------------
+           MOBILE
+        ------------------------- */
+
         @media (max-width: 600px) {
 
-            #modelSelector {
-                padding: 25px 15px;
+            #modelList {
+                padding: 18px;
             }
 
-            .title h1 {
-                font-size: 25px;
+            #modelList h1 {
+                font-size: 23px;
             }
 
-            #models {
+            #cards {
                 grid-template-columns: 1fr;
+            }
+
+            #backBtn,
+            #centerBtn {
+                padding: 10px 13px;
+                font-size: 13px;
             }
         }
     </style>
+
+
+    <!-- THREE.JS -->
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
 </head>
 
 <body>
 
-<!-- ==========================================
-     انتخاب مدل
-========================================== -->
+<!-- =========================
+     MODEL LIST
+========================= -->
 
-<div id="modelSelector">
+<div id="modelList">
 
-    <div class="selector-container">
+    <h1>مدل‌های سه‌بعدی</h1>
 
-        <div class="title">
+    <p>
+        یک مدل را برای مشاهده انتخاب کنید
+    </p>
 
-            <h1>مدل‌های سه‌بعدی</h1>
-
-            <p>
-                یک مدل را برای نمایش انتخاب کنید
-            </p>
-
-        </div>
-
-        <div id="status">
-            در حال دریافت مدل‌ها از GitHub...
-        </div>
-
-        <div id="models"></div>
-
+    <div id="cards">
+        در حال دریافت مدل‌ها...
     </div>
 
 </div>
 
 
-<!-- ==========================================
-     Viewer
-========================================== -->
+<!-- =========================
+     VIEWER
+========================= -->
 
 <div id="viewer">
 
-    <button id="backButton">
+    <button id="backBtn">
         ← بازگشت
     </button>
 
-    <div id="modelInfo"></div>
+    <button id="centerBtn">
+        ⊙ مرکز کردن
+    </button>
 
 </div>
 
 
-<!-- ==========================================
-     Loading
-========================================== -->
+<!-- =========================
+     LOADING
+========================= -->
 
 <div id="loading">
 
     <div id="loadingText">
-        در حال آماده‌سازی مدل...
+        در حال بارگذاری مدل...
     </div>
 
-    <div id="progress">
-        <div id="bar"></div>
+    <div id="progressContainer">
+        <div id="progress"></div>
     </div>
 
     <div id="error"></div>
@@ -350,66 +317,40 @@
 </div>
 
 
-<script type="importmap">
-{
-    "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-}
-</script>
-
-
 <script type="module">
 
-import * as THREE from 'three';
+import * as THREE from "three";
 
-import {
-    GLTFLoader
-} from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader }
+    from "three/addons/loaders/GLTFLoader.js";
 
-import {
-    OrbitControls
-} from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls }
+    from "three/addons/controls/OrbitControls.js";
 
-import {
-    DRACOLoader
-} from 'three/addons/loaders/DRACOLoader.js';
+import { DRACOLoader }
+    from "three/addons/loaders/DRACOLoader.js";
 
 
-// ==================================================
-// GitHub Settings
-// ==================================================
+/* =====================================================
+   CONFIG
+===================================================== */
 
-const OWNER = "xalix18";
+const GITHUB_API =
+    "https://api.github.com/repos/xalix18/dlproj/git/trees/main?recursive=1";
 
-const REPO = "dlproj";
-
-const BRANCH = "main";
-
-
-// GitHub API
-const API_URL =
-    `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
+const RAW_BASE =
+    "https://raw.githubusercontent.com/xalix18/dlproj/main/";
 
 
-// Raw GitHub
-const RAW_URL =
-    `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
+/* =====================================================
+   DOM
+===================================================== */
 
+const modelList =
+    document.getElementById("modelList");
 
-// ==================================================
-// DOM
-// ==================================================
-
-const modelSelector =
-    document.getElementById("modelSelector");
-
-const modelsContainer =
-    document.getElementById("models");
-
-const status =
-    document.getElementById("status");
+const cards =
+    document.getElementById("cards");
 
 const viewer =
     document.getElementById("viewer");
@@ -421,21 +362,21 @@ const loadingText =
     document.getElementById("loadingText");
 
 const progress =
-    document.getElementById("bar");
+    document.getElementById("progress");
 
 const errorBox =
     document.getElementById("error");
 
-const backButton =
-    document.getElementById("backButton");
+const backBtn =
+    document.getElementById("backBtn");
 
-const modelInfo =
-    document.getElementById("modelInfo");
+const centerBtn =
+    document.getElementById("centerBtn");
 
 
-// ==================================================
-// Device
-// ==================================================
+/* =====================================================
+   DEVICE
+===================================================== */
 
 const isMobile =
     /Android|iPhone|iPad|iPod/i.test(
@@ -443,9 +384,9 @@ const isMobile =
     );
 
 
-// ==================================================
-// Three.js
-// ==================================================
+/* =====================================================
+   THREE VARIABLES
+===================================================== */
 
 let scene;
 let camera;
@@ -454,175 +395,27 @@ let controls;
 
 let currentModel = null;
 
+let modelRadius = 2;
 
-// ==================================================
-// GitHub Models
-// ==================================================
-
-async function loadModels() {
-
-    try {
-
-        const response =
-            await fetch(API_URL);
-
-        if (!response.ok) {
-
-            throw new Error(
-                "GitHub API Error: " +
-                response.status
-            );
-        }
-
-        const data =
-            await response.json();
+let cameraTarget =
+    new THREE.Vector3(0, 0, 0);
 
 
-        const files =
-            data.tree.filter(
-                item =>
-                    item.type === "blob" &&
-                    item.path
-                        .toLowerCase()
-                        .endsWith(".glb")
-            );
+/* =====================================================
+   INITIALIZE VIEWER
+===================================================== */
 
+function initViewer() {
 
-        console.log(
-            "GLB files:",
-            files
-        );
-
-
-        if (files.length === 0) {
-
-            status.textContent =
-                "هیچ فایل GLB پیدا نشد.";
-
-            return;
-        }
-
-
-        status.textContent =
-            `${files.length} مدل پیدا شد`;
-
-
-        files.forEach(
-            file => {
-
-                createModelCard(
-                    file
-                );
-            }
-        );
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-            "خطا در دریافت فایل‌های GitHub";
-
-    }
-
-}
-
-
-// ==================================================
-// Create Model Card
-// ==================================================
-
-function createModelCard(file) {
-
-    const card =
-        document.createElement("div");
-
-    card.className =
-        "model-card";
-
-
-    const icon =
-        document.createElement("div");
-
-    icon.className =
-        "model-icon";
-
-    icon.textContent =
-        "🧊";
-
-
-    const name =
-        document.createElement("div");
-
-    name.className =
-        "model-name";
-
-    name.textContent =
-        file.path
-            .split("/")
-            .pop();
-
-
-    const path =
-        document.createElement("div");
-
-    path.className =
-        "model-path";
-
-    path.textContent =
-        file.path;
-
-
-    const button =
-        document.createElement("button");
-
-    button.className =
-        "open-button";
-
-    button.textContent =
-        "باز کردن مدل";
-
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            openModel(
-                file.path
-            );
-
-        }
-    );
-
-
-    card.appendChild(icon);
-
-    card.appendChild(name);
-
-    card.appendChild(path);
-
-    card.appendChild(button);
-
-
-    modelsContainer.appendChild(
-        card
-    );
-}
-
-
-// ==================================================
-// Initialize Three
-// ==================================================
-
-function initThree() {
-
-    scene =
-        new THREE.Scene();
+    scene = new THREE.Scene();
 
     scene.background =
         new THREE.Color(0x111111);
 
+
+    /* -------------------------
+       CAMERA
+    ------------------------- */
 
     camera =
         new THREE.PerspectiveCamera(
@@ -633,49 +426,41 @@ function initThree() {
             1000
         );
 
-
     camera.position.set(
         0,
-        2,
+        1,
         5
     );
 
+
+    /* -------------------------
+       RENDERER
+    ------------------------- */
 
     renderer =
         new THREE.WebGLRenderer({
 
             antialias: !isMobile,
 
+            alpha: false,
+
             powerPreference:
-                "high-performance",
-
-            preserveDrawingBuffer:
-                false,
-
-            stencil: false
-
+                "high-performance"
         });
-
-
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
 
 
     renderer.setPixelRatio(
 
         isMobile
+            ? Math.min(window.devicePixelRatio, 1.25)
+            : Math.min(window.devicePixelRatio, 2)
 
-            ? Math.min(
-                window.devicePixelRatio,
-                1.5
-            )
+    );
 
-            : Math.min(
-                window.devicePixelRatio,
-                2
-            )
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
     );
 
 
@@ -696,9 +481,53 @@ function initThree() {
     );
 
 
-    // ----------------------------------------------
-    // Controls
-    // ----------------------------------------------
+    /* =================================================
+       LIGHTS
+    ================================================= */
+
+    const ambient =
+        new THREE.HemisphereLight(
+            0xffffff,
+            0x444444,
+            2
+        );
+
+    scene.add(ambient);
+
+
+    const directional =
+        new THREE.DirectionalLight(
+            0xffffff,
+            3
+        );
+
+    directional.position.set(
+        5,
+        10,
+        5
+    );
+
+    scene.add(directional);
+
+
+    const directional2 =
+        new THREE.DirectionalLight(
+            0xffffff,
+            1.5
+        );
+
+    directional2.position.set(
+        -5,
+        5,
+        -5
+    );
+
+    scene.add(directional2);
+
+
+    /* =================================================
+       CONTROLS
+    ================================================= */
 
     controls =
         new OrbitControls(
@@ -707,46 +536,119 @@ function initThree() {
         );
 
 
-    controls.enableDamping =
-        true;
+    controls.enableDamping = true;
+
 
     controls.dampingFactor =
-        0.06;
+        isMobile
+            ? 0.08
+            : 0.06;
+
+
+    /*
+       سرعت چرخش
+    */
+
+    controls.rotateSpeed =
+        isMobile
+            ? 0.7
+            : 1;
+
+
+    /*
+       سرعت زوم
+    */
+
+    controls.zoomSpeed =
+        isMobile
+            ? 0.8
+            : 1;
+
+
+    /*
+       حرکت مدل روی صفحه
+    */
+
+    controls.panSpeed =
+        isMobile
+            ? 0.7
+            : 1;
+
+
+    /*
+       پن با مختصات صفحه
+    */
+
+    controls.screenSpacePanning =
+        true;
+
 
     controls.enablePan =
-        !isMobile;
+        true;
 
 
-    // ----------------------------------------------
-    // Lights
-    // ----------------------------------------------
+    /*
+       فاصله زوم
+    */
 
-    const ambient =
-        new THREE.HemisphereLight(
-            0xffffff,
-            0x444444,
-            1.5
-        );
+    controls.minDistance =
+        0.05;
 
-    scene.add(
-        ambient
+    controls.maxDistance =
+        100;
+
+
+    /*
+       حالت لمس موبایل
+
+       یک انگشت:
+       چرخش
+
+       دو انگشت:
+       زوم + حرکت
+    */
+
+    controls.touches.ONE =
+        THREE.TOUCH.ROTATE;
+
+    controls.touches.TWO =
+        THREE.TOUCH.DOLLY_PAN;
+
+
+    controls.target.set(
+        0,
+        0,
+        0
     );
 
 
-    const directional =
-        new THREE.DirectionalLight(
-            0xffffff,
-            2
-        );
+    controls.update();
 
-    directional.position.set(
-        5,
-        10,
-        7
+
+    /* =================================================
+       RESIZE
+    ================================================= */
+
+    window.addEventListener(
+        "resize",
+        onResize
     );
 
-    scene.add(
-        directional
+
+    /* =================================================
+       WEBGL CONTEXT LOST
+    ================================================= */
+
+    renderer.domElement.addEventListener(
+        "webglcontextlost",
+        function(event) {
+
+            event.preventDefault();
+
+            console.warn(
+                "WebGL context lost"
+            );
+        }
     );
 
 
@@ -754,46 +656,257 @@ function initThree() {
 }
 
 
-// ==================================================
-// Open Model
-// ==================================================
+/* =====================================================
+   RESIZE
+===================================================== */
 
-function openModel(path) {
+function onResize() {
 
-    modelSelector.style.display =
-        "none";
+    if (!camera || !renderer)
+        return;
 
-    viewer.classList.add(
-        "active"
+
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+}
+
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
     );
 
-    loading.classList.add(
-        "active"
-    );
 
+    if (controls) {
+
+        controls.update();
+
+    }
+
+
+    if (renderer && scene && camera) {
+
+        renderer.render(
+            scene,
+            camera
+        );
+
+    }
+}
+
+
+/* =====================================================
+   LOADING UI
+===================================================== */
+
+function showLoading(
+    text = "در حال بارگذاری مدل..."
+) {
+
+    loading.style.display =
+        "flex";
 
     loadingText.textContent =
-        "در حال دانلود مدل...";
+        text;
 
     progress.style.width =
         "0%";
 
     errorBox.textContent =
         "";
+}
 
 
-    modelInfo.textContent =
-        path;
+function hideLoading() {
+
+    loading.style.display =
+        "none";
+}
 
 
-    if (!renderer) {
+/* =====================================================
+   GET GLB FILES FROM GITHUB
+===================================================== */
 
-        initThree();
+async function loadModelList() {
+
+    try {
+
+        const response =
+            await fetch(
+                GITHUB_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "GitHub API error: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const glbFiles =
+            data.tree.filter(
+                item =>
+                    item.type === "blob" &&
+                    item.path
+                        .toLowerCase()
+                        .endsWith(".glb")
+            );
+
+
+        if (glbFiles.length === 0) {
+
+            cards.innerHTML =
+                "<p>هیچ فایل GLB پیدا نشد.</p>";
+
+            return;
+        }
+
+
+        cards.innerHTML =
+            "";
+
+
+        glbFiles.forEach(
+            file => {
+
+                createModelCard(
+                    file.path
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        cards.innerHTML = `
+            <p style="color:#ff7070">
+                دریافت لیست مدل‌ها انجام نشد.
+                <br>
+                ${error.message}
+            </p>
+        `;
 
     }
+}
 
 
-    // مدل قبلی
+/* =====================================================
+   CREATE MODEL CARD
+===================================================== */
+
+function createModelCard(
+    path
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "model-card";
+
+
+    const fileName =
+        path
+            .split("/")
+            .pop();
+
+
+    card.innerHTML = `
+
+        <div class="model-name">
+            ${fileName}
+        </div>
+
+        <div class="model-path">
+            ${path}
+        </div>
+
+        <button class="open-btn">
+            مشاهده مدل
+        </button>
+
+    `;
+
+
+    const button =
+        card.querySelector(
+            ".open-btn"
+        );
+
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            openModel(path);
+
+        }
+    );
+
+
+    cards.appendChild(
+        card
+    );
+}
+
+
+/* =====================================================
+   OPEN MODEL
+===================================================== */
+
+async function openModel(
+    path
+) {
+
+    modelList.style.display =
+        "none";
+
+
+    viewer.style.display =
+        "block";
+
+
+    showLoading(
+        "در حال بارگذاری " +
+        path.split("/").pop()
+    );
+
+
+    /*
+       اگر مدل قبلی وجود دارد
+       حذفش می‌کنیم
+    */
+
     if (currentModel) {
 
         disposeModel(
@@ -808,117 +921,157 @@ function openModel(path) {
     }
 
 
-    const loader =
-        new GLTFLoader();
-
-
-    // Draco
-    const draco =
-        new DRACOLoader();
-
-    draco.setDecoderPath(
-        "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
-    );
-
-    loader.setDRACOLoader(
-        draco
-    );
-
+    /*
+       URL مدل
+    */
 
     const url =
-        RAW_URL +
+        RAW_BASE +
         path
             .split("/")
             .map(
-                encodeURIComponent
+                part =>
+                    encodeURIComponent(part)
             )
             .join("/");
 
 
-    console.log(
-        "Loading:",
-        url
-    );
+    try {
+
+        const loader =
+            new GLTFLoader();
 
 
-    loader.load(
+        /* -------------------------
+           DRACO
+        ------------------------- */
 
-        url,
-
-        gltf => {
-
-            currentModel =
-                gltf.scene;
+        const dracoLoader =
+            new DRACOLoader();
 
 
-            optimizeModel(
-                currentModel
+        dracoLoader.setDecoderPath(
+            "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
+        );
+
+
+        loader.setDRACOLoader(
+            dracoLoader
+        );
+
+
+        /* -------------------------
+           LOAD
+        ------------------------- */
+
+        const gltf =
+            await new Promise(
+                (resolve, reject) => {
+
+                    loader.load(
+
+                        url,
+
+                        resolve,
+
+                        xhr => {
+
+                            if (
+                                xhr.total
+                            ) {
+
+                                const percent =
+                                    (
+                                        xhr.loaded /
+                                        xhr.total
+                                    ) * 100;
+
+
+                                progress.style.width =
+                                    percent + "%";
+
+
+                                loadingText.textContent =
+                                    "در حال بارگذاری: " +
+                                    Math.round(percent) +
+                                    "%";
+
+                            } else {
+
+                                loadingText.textContent =
+                                    "در حال دریافت مدل...";
+
+                            }
+
+                        },
+
+                        reject
+
+                    );
+
+                }
             );
 
 
-            centerModel(
-                currentModel
-            );
+        currentModel =
+            gltf.scene;
 
 
-            scene.add(
-                currentModel
-            );
+        /*
+           بهینه‌سازی متریال‌ها
+        */
+
+        optimizeModel(
+            currentModel
+        );
 
 
-            loading.classList.remove(
-                "active"
-            );
+        /*
+           قرار دادن مدل
+           و تنظیم دوربین
+        */
+
+        frameModel(
+            currentModel
+        );
 
 
-            draco.dispose();
-
-        },
-
-
-        xhr => {
-
-            if (xhr.total > 0) {
-
-                const percent =
-                    xhr.loaded /
-                    xhr.total *
-                    100;
-
-                progress.style.width =
-                    percent + "%";
-
-                loadingText.textContent =
-                    "در حال دانلود مدل " +
-                    Math.round(percent) +
-                    "%";
-
-            }
-
-        },
+        scene.add(
+            currentModel
+        );
 
 
-        error => {
+        hideLoading();
 
-            console.error(
-                error
-            );
 
-            loadingText.textContent =
-                "خطا در بارگذاری مدل";
+    } catch (error) {
 
-            errorBox.textContent =
-                "فایل مدل قابل بارگذاری نیست.";
+        console.error(
+            error
+        );
 
-            draco.dispose();
-        }
-    );
+
+        errorBox.textContent =
+            "خطا در بارگذاری مدل";
+
+
+        loadingText.textContent =
+            "بارگذاری ناموفق بود";
+
+
+        console.error(
+            "Model URL:",
+            url
+        );
+
+    }
+
 }
 
 
-// ==================================================
-// Optimize
-// ==================================================
+/* =====================================================
+   OPTIMIZE MODEL
+===================================================== */
 
 function optimizeModel(
     model
@@ -931,8 +1084,16 @@ function optimizeModel(
                 return;
 
 
-            object.frustumCulled =
-                true;
+            /*
+               Shadows را خاموش می‌کنیم
+               چون روی موبایل سنگین هستند
+            */
+
+            object.castShadow =
+                false;
+
+            object.receiveShadow =
+                false;
 
 
             const materials =
@@ -940,9 +1101,7 @@ function optimizeModel(
                     object.material
                 )
                     ? object.material
-                    : [
-                        object.material
-                    ];
+                    : [object.material];
 
 
             materials.forEach(
@@ -952,44 +1111,65 @@ function optimizeModel(
                         return;
 
 
-                    Object.keys(
-                        material
-                    ).forEach(
-                        key => {
+                    /*
+                       anisotropy کمتر روی موبایل
+                    */
 
-                            const value =
-                                material[key];
+                    if (
+                        material.map
+                    ) {
 
-
-                            if (
-                                value &&
-                                value.isTexture
-                            ) {
-
-                                if (
-                                    isMobile
-                                ) {
-
-                                    value.anisotropy =
-                                        1;
-
-                                    value.generateMipmaps =
-                                        false;
-
-                                    value.minFilter =
-                                        THREE.LinearFilter;
-                                }
-
-                            }
-
-                        }
-                    );
+                        material.map.anisotropy =
+                            isMobile
+                                ? 1
+                                : Math.min(
+                                    renderer.capabilities
+                                        .getMaxAnisotropy(),
+                                    4
+                                );
 
 
-                    material.needsUpdate =
-                        true;
+                        material.map.needsUpdate =
+                            true;
+
+                    }
+
+
+                    /*
+                       Texture های دیگر
+                    */
+
+                    if (
+                        material.normalMap
+                    ) {
+
+                        material.normalMap.anisotropy =
+                            1;
+
+                    }
+
+
+                    if (
+                        material.roughnessMap
+                    ) {
+
+                        material.roughnessMap.anisotropy =
+                            1;
+
+                    }
+
+
+                    if (
+                        material.metalnessMap
+                    ) {
+
+                        material.metalnessMap.anisotropy =
+                            1;
+
+                    }
 
                 }
+
             );
 
         }
@@ -997,25 +1177,21 @@ function optimizeModel(
 }
 
 
-// ==================================================
-// Center Model
-// ==================================================
+/* =====================================================
+   FRAME MODEL
+===================================================== */
 
-function centerModel(
+function frameModel(
     model
 ) {
 
+    /*
+       ابتدا scale اصلی را به دست می‌آوریم
+    */
+
     const box =
         new THREE.Box3()
-            .setFromObject(
-                model
-            );
-
-
-    const center =
-        box.getCenter(
-            new THREE.Vector3()
-        );
+            .setFromObject(model);
 
 
     const size =
@@ -1024,12 +1200,299 @@ function centerModel(
         );
 
 
-    model.position.sub(
-        center
+    const center =
+        box.getCenter(
+            new THREE.Vector3()
+        );
+
+
+    /*
+       مدل را در مرکز قرار می‌دهیم
+    */
+
+    model.position.x -=
+        center.x;
+
+    model.position.y -=
+        center.y;
+
+    model.position.z -=
+        center.z;
+
+
+    /*
+       دوباره bounding box
+    */
+
+    const newBox =
+        new THREE.Box3()
+            .setFromObject(model);
+
+
+    const newSize =
+        newBox.getSize(
+            new THREE.Vector3()
+        );
+
+
+    /*
+       بزرگ‌ترین بعد مدل
+    */
+
+    const maxSize =
+        Math.max(
+            newSize.x,
+            newSize.y,
+            newSize.z
+        );
+
+
+    /*
+       مدل را به اندازه مناسب
+       normalize می‌کنیم
+    */
+
+    const desiredSize =
+        4;
+
+
+    const scale =
+        desiredSize /
+        maxSize;
+
+
+    model.scale.setScalar(
+        scale
     );
 
 
-    const maxSize =
+    /*
+       bounding box بعد از scale
+    */
+
+    const finalBox =
+        new THREE.Box3()
+            .setFromObject(model);
+
+
+    const finalSize =
+        finalBox.getSize(
+            new THREE.Vector3()
+        );
+
+
+    const finalCenter =
+        finalBox.getCenter(
+            new THREE.Vector3()
+        );
+
+
+    /*
+       ارتفاع مدل
+    */
+
+    const height =
+        finalSize.y;
+
+
+    /*
+       تشخیص تقریبی شخصیت
+
+       اگر ارتفاع خیلی بیشتر
+       از عرض باشد، احتمالاً
+       مدل یک انسان / کاراکتر است.
+    */
+
+    const widthDepth =
+        Math.max(
+            finalSize.x,
+            finalSize.z
+        );
+
+
+    const characterRatio =
+        height /
+        Math.max(widthDepth, 0.001);
+
+
+    const isCharacter =
+        characterRatio > 1.7;
+
+
+    /*
+       هدف دوربین
+    */
+
+    let targetY;
+
+
+    if (isCharacter) {
+
+        /*
+           برای شخصیت:
+           حدود 55٪ ارتفاع
+           یعنی اطراف سینه/صورت
+        */
+
+        targetY =
+            finalBox.min.y +
+            height * 0.55;
+
+    } else {
+
+        /*
+           برای مدل‌های معمولی:
+           مرکز مدل
+        */
+
+        targetY =
+            finalCenter.y;
+
+    }
+
+
+    cameraTarget.set(
+        finalCenter.x,
+        targetY,
+        finalCenter.z
+    );
+
+
+    /*
+       شعاع مدل
+    */
+
+    const sphere =
+        new THREE.Sphere();
+
+
+    finalBox.getBoundingSphere(
+        sphere
+    );
+
+
+    modelRadius =
+        sphere.radius;
+
+
+    /*
+       فاصله مناسب دوربین
+    */
+
+    const distance =
+        Math.max(
+            modelRadius * 2.4,
+            2.5
+        );
+
+
+    /*
+       دوربین را کمی مورب
+       قرار می‌دهیم
+    */
+
+    camera.position.set(
+
+        finalCenter.x,
+
+        targetY +
+
+        (isCharacter
+            ? height * 0.08
+            : modelRadius * 0.15),
+
+        finalCenter.z +
+        distance
+
+    );
+
+
+    /*
+       هدف OrbitControls
+    */
+
+    controls.target.copy(
+        cameraTarget
+    );
+
+
+    /*
+       محدودیت زوم بر اساس مدل
+    */
+
+    controls.minDistance =
+        Math.max(
+            modelRadius * 0.15,
+            0.05
+        );
+
+
+    controls.maxDistance =
+        Math.max(
+            modelRadius * 8,
+            20
+        );
+
+
+    camera.near =
+        Math.max(
+            modelRadius / 1000,
+            0.001
+        );
+
+
+    camera.far =
+        Math.max(
+            modelRadius * 100,
+            100
+        );
+
+
+    camera.updateProjectionMatrix();
+
+
+    controls.update();
+
+
+    /*
+       مدل را کمی بهتر داخل صفحه
+       قرار می‌دهیم
+    */
+
+    fitCameraToModel(
+        model,
+        1.15
+    );
+}
+
+
+/* =====================================================
+   FIT CAMERA
+===================================================== */
+
+function fitCameraToModel(
+    model,
+    offset = 1.2
+) {
+
+    const box =
+        new THREE.Box3()
+            .setFromObject(model);
+
+
+    const size =
+        box.getSize(
+            new THREE.Vector3()
+        );
+
+
+    const center =
+        box.getCenter(
+            new THREE.Vector3()
+        );
+
+
+    const maxDim =
         Math.max(
             size.x,
             size.y,
@@ -1037,38 +1500,142 @@ function centerModel(
         );
 
 
-    if (maxSize > 0) {
+    const fov =
+        camera.fov *
+        Math.PI /
+        180;
 
-        const scale =
-            4 / maxSize;
 
-        model.scale.setScalar(
-            scale
+    let distance =
+        Math.abs(
+            maxDim /
+            2 /
+            Math.tan(fov / 2)
+        );
+
+
+    distance *=
+        offset;
+
+
+    /*
+       جهت فعلی دوربین
+    */
+
+    const direction =
+        new THREE.Vector3();
+
+
+    direction
+        .subVectors(
+            camera.position,
+            controls.target
+        )
+        .normalize();
+
+
+    /*
+       اگر جهت معتبر نبود
+    */
+
+    if (
+        !isFinite(direction.x) ||
+        !isFinite(direction.y) ||
+        !isFinite(direction.z)
+    ) {
+
+        direction.set(
+            0,
+            0,
+            1
         );
 
     }
 
 
-    controls.target.set(
-        0,
-        0,
-        0
+    camera.position.copy(
+        controls.target
     );
+
+
+    camera.position.add(
+        direction.multiplyScalar(
+            distance
+        )
+    );
+
+
+    camera.lookAt(
+        controls.target
+    );
+
 
     controls.update();
-
-
-    camera.position.set(
-        0,
-        2,
-        5
-    );
 }
 
 
-// ==================================================
-// Dispose
-// ==================================================
+/* =====================================================
+   CENTER CAMERA BUTTON
+===================================================== */
+
+centerBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!currentModel)
+            return;
+
+
+        frameModel(
+            currentModel
+        );
+
+    }
+);
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+backBtn.addEventListener(
+    "click",
+    () => {
+
+        /*
+           مدل را پاک کن
+        */
+
+        if (currentModel) {
+
+            disposeModel(
+                currentModel
+            );
+
+            scene.remove(
+                currentModel
+            );
+
+            currentModel =
+                null;
+
+        }
+
+
+        viewer.style.display =
+            "none";
+
+
+        modelList.style.display =
+            "block";
+
+    }
+);
+
+
+/* =====================================================
+   DISPOSE MODEL
+===================================================== */
 
 function disposeModel(
     model
@@ -1082,6 +1649,7 @@ function disposeModel(
             ) {
 
                 object.geometry.dispose();
+
             }
 
 
@@ -1094,13 +1662,19 @@ function disposeModel(
                         object.material
                     )
                         ? object.material
-                        : [
-                            object.material
-                        ];
+                        : [object.material];
 
 
                 materials.forEach(
                     material => {
+
+                        if (!material)
+                            return;
+
+
+                        /*
+                           Texture ها
+                        */
 
                         Object.keys(
                             material
@@ -1117,6 +1691,7 @@ function disposeModel(
                                 ) {
 
                                     value.dispose();
+
                                 }
 
                             }
@@ -1135,12 +1710,21 @@ function disposeModel(
 }
 
 
-// ==================================================
-// Back
-// ==================================================
+/* =====================================================
+   START
+===================================================== */
 
-backButton.addEventListener(
-    "click",
+initViewer();
+
+loadModelList();
+
+
+/* =====================================================
+   PAGE HIDE
+===================================================== */
+
+window.addEventListener(
+    "pagehide",
     () => {
 
         if (currentModel) {
@@ -1149,95 +1733,10 @@ backButton.addEventListener(
                 currentModel
             );
 
-            scene.remove(
-                currentModel
-            );
-
-            currentModel =
-                null;
         }
 
-
-        viewer.classList.remove(
-            "active"
-        );
-
-
-        modelSelector.style.display =
-            "block";
-
     }
 );
-
-
-// ==================================================
-// Render
-// ==================================================
-
-function animate() {
-
-    requestAnimationFrame(
-        animate
-    );
-
-
-    if (controls) {
-
-        controls.update();
-    }
-
-
-    if (
-        renderer &&
-        scene &&
-        camera
-    ) {
-
-        renderer.render(
-            scene,
-            camera
-        );
-    }
-
-}
-
-
-// ==================================================
-// Resize
-// ==================================================
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        if (!camera ||
-            !renderer)
-            return;
-
-
-        camera.aspect =
-            window.innerWidth /
-            window.innerHeight;
-
-
-        camera.updateProjectionMatrix();
-
-
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight,
-            false
-        );
-
-    }
-);
-
-
-// ==================================================
-// Start
-// ==================================================
-
-loadModels();
 
 </script>
 
